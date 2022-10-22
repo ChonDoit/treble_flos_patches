@@ -1,0 +1,26 @@
+From 2214158c6d8bf8aa9b26508d4ace09cedf63dbba Mon Sep 17 00:00:00 2001
+From: ChonDoit <thphantomblog@gmail.com>
+Date: Fri, 21 Oct 2022 21:40:26 +0000
+Subject: [PATCH] Push NFC Config
+
+---
+ base.mk | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/base.mk b/base.mk
+index f477aa3..468b0c0 100644
+--- a/base.mk
++++ b/base.mk
+@@ -70,7 +70,8 @@ endif
+ 
+ PRODUCT_COPY_FILES += \
+ 	device/phh/treble/empty:system/phh/empty \
+-	device/phh/treble/phh-on-boot.sh:system/bin/phh-on-boot.sh
++	device/phh/treble/phh-on-boot.sh:system/bin/phh-on-boot.sh \
++	device/phh/treble/libnfc-nci.conf:system/etc/libnfc-nci.conf
+ 
+ PRODUCT_PACKAGES += \
+ 	treble-environ-rc \
+-- 
+2.34.1
+

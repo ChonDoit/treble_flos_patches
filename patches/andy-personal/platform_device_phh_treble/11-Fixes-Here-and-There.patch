@@ -1,0 +1,169 @@
+From 591962f5fe88e75de85eefce643f241b0a7d6ead Mon Sep 17 00:00:00 2001
+From: ChonDoit <thphantomblog@gmail.com>
+Date: Wed, 19 Oct 2022 16:15:58 +0000
+Subject: [PATCH] Fixes here and there
+
+---
+ generate.sh            | 12 ++++--
+ libnfc-nci.conf        | 90 ++++++++++++++++++++++++++++++++++++++++++
+ sepolicy/file_contexts |  3 --
+ 5 files changed, 104 insertions(+), 6 deletions(-)
+ create mode 100644 libnfc-nci.conf
+
+diff --git a/generate.sh b/generate.sh
+index 659737d..61d906d 100644
+--- a/generate.sh
++++ b/generate.sh
+@@ -14,6 +14,8 @@ fi
+ 
+ echo 'PRODUCT_MAKEFILES := \' > AndroidProducts.mk
+ 
++secureflag='($(PHH-SECURE_BUILD)'
++
+ for part in a ab;do
+ 	for apps in vanilla gapps foss gapps-go;do
+ 		for arch in arm64 arm a64;do
+@@ -26,7 +28,6 @@ for part in a ab;do
+ 		optional_base=""
+ 				if [ "$apps" == "gapps" ];then
+ 					apps_suffix="g"
+-					apps_script='$(call inherit-product, device/phh/treble/gapps.mk)'
+ 					apps_name="with GApps"
+ 				fi
+ 				if [ "$apps" == "gapps-go" ];then
+@@ -54,7 +55,6 @@ for part in a ab;do
+ 				su_suffix='N'
+ 				if [ "$su" == "yes" ];then
+ 					su_suffix='S'
+-					extra_packages+=' phh-su me.phh.superuser'
+ 				fi
+ 
+ 				part_suffix='a'
+@@ -94,7 +94,13 @@ PRODUCT_MODEL := Phh-Treble $apps_name
+ # Overwrite the inherited "emulator" characteristics
+ PRODUCT_CHARACTERISTICS := device
+ 
+-PRODUCT_PACKAGES += $extra_packages
++# Secure build?
++ifeq ${secureflag}, true)
++        PRODUCT_NAME := treble_arm64_bgN
++                else
++        PRODUCT_NAME := treble_arm64_bgS
++        PRODUCT_PACKAGES += phh-su SuperUser
++endif
+ 
+ EOF
+ echo -e '\t$(LOCAL_DIR)/'$target.mk '\' >> AndroidProducts.mk
+diff --git a/libnfc-nci.conf b/libnfc-nci.conf
+new file mode 100644
+index 0000000..ce28052
+--- /dev/null
++++ b/libnfc-nci.conf
+@@ -0,0 +1,90 @@
++###############################################################################
++# Debug options
++NFC_DEBUG_ENABLED=0
++
++###############################################################################
++# File used for NFA storage
++NFA_STORAGE="/data/nfc"
++PRESERVE_STORAGE=0x01
++
++###############################################################################
++# When screen is turned off, specify the desired power state of the controller.
++# 0: power-off-sleep state; DEFAULT
++# 1: full-power state
++# 2: screen-off card-emulation (CE4/CE3/CE1 modes are used)
++SCREEN_OFF_POWER_STATE=1
++
++###############################################################################
++# Default poll duration (in ms)
++# Default is 500ms if not set (see nfc_target.h)
++#NFA_DM_DISC_DURATION_POLL=333
++
++###############################################################################
++# Force tag polling for the following technology(s).
++# The bits are defined as tNFA_TECHNOLOGY_MASK in nfa_api.h.
++# Default is NFA_TECHNOLOGY_MASK_A | NFA_TECHNOLOGY_MASK_B |
++#            NFA_TECHNOLOGY_MASK_F | NFA_TECHNOLOGY_MASK_ISO15693 |
++#            NFA_TECHNOLOGY_MASK_B_PRIME | NFA_TECHNOLOGY_MASK_KOVIO |
++#            NFA_TECHNOLOGY_MASK_A_ACTIVE | NFA_TECHNOLOGY_MASK_F_ACTIVE.
++#
++# Notable bits:
++# NFA_TECHNOLOGY_MASK_A             0x01    /* NFC Technology A             */
++# NFA_TECHNOLOGY_MASK_B             0x02    /* NFC Technology B             */
++# NFA_TECHNOLOGY_MASK_F             0x04    /* NFC Technology F             */
++# NFA_TECHNOLOGY_MASK_ISO15693      0x08    /* Proprietary Technology       */
++# NFA_TECHNOLOGY_MASK_KOVIO         0x20    /* Proprietary Technology       */
++# NFA_TECHNOLOGY_MASK_A_ACTIVE      0x40    /* NFC Technology A active mode */
++# NFA_TECHNOLOGY_MASK_F_ACTIVE      0x80    /* NFC Technology F active mode */
++POLLING_TECH_MASK=0x2F
++
++###############################################################################
++# Force P2P to only listen for the following technology(s).
++# The bits are defined as tNFA_TECHNOLOGY_MASK in nfa_api.h.
++# Default is NFA_TECHNOLOGY_MASK_A | NFA_TECHNOLOGY_MASK_F |
++#            NFA_TECHNOLOGY_MASK_A_ACTIVE | NFA_TECHNOLOGY_MASK_F_ACTIVE
++#
++# Notable bits:
++# NFA_TECHNOLOGY_MASK_A             0x01    /* NFC Technology A             */
++# NFA_TECHNOLOGY_MASK_F             0x04    /* NFC Technology F             */
++# NFA_TECHNOLOGY_MASK_A_ACTIVE      0x40    /* NFC Technology A active mode */
++# NFA_TECHNOLOGY_MASK_F_ACTIVE      0x80    /* NFC Technology F active mode */
++P2P_LISTEN_TECH_MASK=0x00
++
++###############################################################################
++# Force UICC to only listen to the following technology(s).
++# The bits are defined as tNFA_TECHNOLOGY_MASK in nfa_api.h.
++# Default is NFA_TECHNOLOGY_MASK_A | NFA_TECHNOLOGY_MASK_B | NFA_TECHNOLOGY_MASK_F
++UICC_LISTEN_TECH_MASK=0x07
++
++###############################################################################
++# Override the stack default for NFA_EE_MAX_EE_SUPPORTED set in nfc_target.h.
++# The value is set to 3 by default as it assumes we will discover 0xF2,
++# 0xF3, and 0xF4. If a platform will exclude and SE, this value can be reduced
++# so that the stack will not wait any longer than necessary.
++# Maximum EE supported number
++# NXP PN547C2 0x02
++# NXP PN65T 0x03
++# NXP PN548C2 0x02
++# NXP PN66T 0x03
++NFA_MAX_EE_SUPPORTED=0x02
++
++###############################################################################
++# AID for Empty Select command
++# If specified, this AID will be substituted when an Empty SELECT command is
++# detected.  The first byte is the length of the AID.  Maximum length is 16.
++AID_FOR_EMPTY_SELECT={08:A0:00:00:01:51:00:00:00}
++
++###############################################################################
++# AID_MATCHING constants
++# AID_MATCHING_EXACT_ONLY 0x00
++# AID_MATCHING_EXACT_OR_PREFIX 0x01
++# AID_MATCHING_PREFIX_ONLY 0x02
++AID_MATCHING_MODE=0x01
++
++###############################################################################
++# NCI_RESET_TYPE options
++# Default 0x00, reset configurations everytime.
++# 0x01, reset configurations only once every boot.
++# 0x02, keep configurations.
++NCI_RESET_TYPE=0x00
++
+diff --git a/sepolicy/file_contexts b/sepolicy/file_contexts
+index 4ae5095..5e39d5b 100644
+--- a/sepolicy/file_contexts
++++ b/sepolicy/file_contexts
+@@ -6,9 +6,6 @@
+ /system/bin/phh-on-data.sh u:object_r:phhsu_exec:s0
+ /system/bin/asus-motor u:object_r:phhsu_exec:s0
+ 
+-#/system/bin/fsck\.exfat                 u:object_r:fsck_exec:s0
+-/system/bin/fsck\.ntfs                  u:object_r:fsck_exec:s0
+-
+ /bt_firmware(/.*)?      u:object_r:bt_firmware_file:s0
+ 
+ /sec_storage(/.*)?      u:object_r:teecd_data_file:s0
+-- 
+2.34.1
+

@@ -1,0 +1,74 @@
+From fe3ddc424f919762f84925b58973616533d1a2ae Mon Sep 17 00:00:00 2001
+From: ChonDoit <thphantomblog@gmail.com>
+Date: Wed, 19 Oct 2022 16:20:14 +0000
+Subject: [PATCH] Setup Treble Build
+
+---
+ config/common.mk | 26 +++++++-------------------
+ 1 file changed, 7 insertions(+), 19 deletions(-)
+
+diff --git a/config/common.mk b/config/common.mk
+index 00c00a76..1f5e16ea 100644
+--- a/config/common.mk
++++ b/config/common.mk
+@@ -1,6 +1,9 @@
+ # Allow vendor/extra to override any property by setting it first
+ $(call inherit-product-if-exists, vendor/extra/product.mk)
+ 
++# PHH GSI
++$(call inherit-product, vendor/lineage/config/phh_gsi.mk)
++
+ PRODUCT_BRAND ?= LineageOS
+ 
+ PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
+@@ -13,20 +16,6 @@ PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+     ro.com.google.clientidbase=$(PRODUCT_GMS_CLIENTID_BASE)
+ endif
+ 
+-ifeq ($(TARGET_BUILD_VARIANT),eng)
+-# Disable ADB authentication
+-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=0
+-
+-# Disable extra StrictMode features on all non-engineering builds
+-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.strictmode.disable=true
+-else
+-# Enable ADB authentication
+-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += ro.adb.secure=1
+-
+-# Disable extra StrictMode features on all non-engineering builds
+-PRODUCT_SYSTEM_DEFAULT_PROPERTIES += persist.sys.strictmode.disable=true
+-endif
+-
+ BUILD_FINGERPRINT := google/raven/raven:12/SQ3A.220605.009.B1/8650216:user/release-keys
+ 
+ # Backup Tool
+@@ -103,8 +92,8 @@ PRODUCT_MINIMIZE_JAVA_DEBUG_INFO := true
+ PRODUCT_RESTRICT_VENDOR_FILES := false
+ 
+ # Bootanimation
+-TARGET_SCREEN_WIDTH ?= 1080
+-TARGET_SCREEN_HEIGHT ?= 1920
++TARGET_SCREEN_WIDTH ?= 720
++TARGET_SCREEN_HEIGHT ?= 1280
+ PRODUCT_PACKAGES += \
+     bootanimation.zip
+ 
+@@ -344,8 +333,8 @@ ifdef LINEAGE_BUILDTYPE
+     endif
+ else
+     # If LINEAGE_BUILDTYPE is not defined, set to UNOFFICIAL
+-    LINEAGE_BUILDTYPE := UNOFFICIAL
+-    LINEAGE_EXTRAVERSION :=
++    LINEAGE_BUILDTYPE := TREBLE-UNOFFICIAL
++    LINEAGE_EXTRAVERSION := 
+ endif
+ 
+ ifeq ($(LINEAGE_BUILDTYPE), UNOFFICIAL)
+@@ -436,4 +425,3 @@ endif
+ USE_CCACHE := true
+ 
+ -include $(WORKSPACE)/build_env/image-auto-bits.mk
+--include vendor/lineage/config/partner_gms.mk
+-- 
+2.34.1
+

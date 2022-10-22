@@ -1,0 +1,44 @@
+From b82c6bd5cca80a6a283ba777c6e6731f88b14cf1 Mon Sep 17 00:00:00 2001
+From: ChonDoit <thphantomblog@gmail.com>
+Date: Wed, 19 Oct 2022 16:22:27 +0000
+Subject: [PATCH] Add phh_gsi.mk
+
+---
+ config/phh_gsi.mk | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+ create mode 100644 config/phh_gsi.mk
+
+diff --git a/config/phh_gsi.mk b/config/phh_gsi.mk
+new file mode 100644
+index 00000000..26168704
+--- /dev/null
++++ b/config/phh_gsi.mk
+@@ -0,0 +1,25 @@
++# The Gapps
++$(call inherit-product, vendor/gapps/config.mk)
++
++TARGET_FLOS := true
++LINEAGE_BUILD := treble
++
++# Secure Build
++PHH-SECURE_BUILD := false
++BOARD_EXT4_SHARE_DUP_BLOCKS := false
++
++# Don't Build Kernel
++TARGET_NO_KERNEL := true
++TARGET_NO_KERNEL_OVERRIDE := true
++
++# Use CCache
++USE_CCACHE := true
++
++PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
++	dalvik.vm.dex2oat64.enabled=true \
++	persist.sys.pixelprops.gphotos=true \
++	persist.sys.pixelprops.games=false
++
++# APNS
++PRODUCT_PACKAGES += \
++        apns-conf.xml
+-- 
+2.34.1
+

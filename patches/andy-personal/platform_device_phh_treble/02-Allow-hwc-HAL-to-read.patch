@@ -1,0 +1,39 @@
+From 098a093224fbc33dda3eb909d58ace1d0421af3c Mon Sep 17 00:00:00 2001
+From: ChonDoit <thphantomblog@gmail.com>
+Date: Tue, 18 Oct 2022 02:20:40 +0000
+Subject: [PATCH] Adress Samsung hs-vsync mode
+
+---
+ sepolicy/property_contexts | 2 ++
+ sepolicy/samsung.te        | 9 +++++++++
+ 2 files changed, 11 insertions(+)
+ create mode 100644 sepolicy/property_contexts
+
+diff --git a/sepolicy/property_contexts b/sepolicy/property_contexts
+new file mode 100644
+index 0000000..185a08b
+--- /dev/null
++++ b/sepolicy/property_contexts
+@@ -0,0 +1,2 @@
++persist.sys.sf.hs_mode         u:object_r:sf_hs_mode_prop:s0
++hwc.exynos.vsync_mode      u:object_r:vendor_hwc_prop:s0
+diff --git a/sepolicy/samsung.te b/sepolicy/samsung.te
+index 63f4edc..673d551 100644
+--- a/sepolicy/samsung.te
++++ b/sepolicy/samsung.te
+@@ -2,3 +2,12 @@ type boot_prop, property_type;
+ 
+ set_prop(system_server, boot_prop);
+ 
++type hal_graphics_composer_default, domain;
++
++type sf_hs_mode_prop, property_type;
++
++get_prop(hal_graphics_composer_default, sf_hs_mode_prop);
++
++type vendor_hwc_prop, property_type;
++
++get_prop(hal_graphics_composer_default, vendor_hwc_prop);
+-- 
+2.34.1
+

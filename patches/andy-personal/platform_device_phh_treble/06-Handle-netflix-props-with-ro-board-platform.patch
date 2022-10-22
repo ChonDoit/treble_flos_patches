@@ -1,0 +1,53 @@
+From ab655b5a20911e0b8c84789ce69266f9bbc08536 Mon Sep 17 00:00:00 2001
+From: ChonDoit <thphantomblog@gmail.com>
+Date: Tue, 18 Oct 2022 02:22:31 +0000
+Subject: [PATCH] Handle Netflix with ro.board.platform
+
+---
+ rw-system.sh | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/rw-system.sh b/rw-system.sh
+index d27e8d4..b3661cb 100644
+--- a/rw-system.sh
++++ b/rw-system.sh
+@@ -904,12 +904,32 @@ fi
+ 
+ resetprop_phh ro.bluetooth.library_name libbluetooth.so
+ 
+-if getprop ro.vendor.build.fingerprint |grep -iq xiaomi/cepheus;then
+-    setprop ro.netflix.bsp_rev Q855-16947-1
++board="$(getprop ro.board.platform)"
++
++if [ "$board" = atoll ] || [ "$board" = sm6250 ]; then
++	setprop ro.netflix.bsp_rev Q6250-19132-1
++fi
++
++if [ "$board" = msmnile ]; then
++	setprop ro.netflix.bsp_rev Q855-16947-1
++fi
++
++if [ "$board" = sm6150 ]; then
++	setprop ro.netflix.bsp_rev Q6150-17263-1
++fi
++
++if [ "$board" = mt6768 ]; then
++	setprop ro.netflix.bsp_rev MTK6768-19055-1
++fi
++
++if [ "$board" = lahaina ]; then
++	setprop ro.netflix.bsp_rev Q875-32774-1
++	resetprop_phh ro.config.media_vol_steps 25
++	resetprop_phh ro.config.media_vol_default 15
+ fi
+ 
+-if getprop ro.vendor.build.fingerprint |grep -qi redmi/curtana;then
+-    setprop ro.netflix.bsp_rev Q6250-19132-1
++if [ "$board" = universal8825 ];then
++	setprop ro.netflix.bsp_rev EXYNOS1280-34993-1
+ fi
+ 
+ # Set props for Vsmart Live's fod
+-- 
+2.34.1
+
