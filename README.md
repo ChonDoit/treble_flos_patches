@@ -7,3 +7,6 @@ These people have helped this project in some way or another, so they should be 
 - [AndyYan](https://github.com/AndyCGYan)
 - [ponces](https://github.com/ponces)
 - [eremitein](https://github.com/eremitein)
+- [Peter Cai](https://github.com/PeterCxy)
+- [haridhayal11](https://github.com/haridhayal11)
+- [Iceows](https://github.com/Iceows)
